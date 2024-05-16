@@ -2,37 +2,30 @@
 #define TREM_H
 
 #include <QThread>
+#include <QSlider>
+#include <QSemaphore>
 
-/*
- * Classe Trem herda QThread
- * Classe Trem passa a ser uma thread.
- * A função START inicializa a thread. Após inicializada, a thread irá executar a função RUN.
- * Para parar a execução da função RUN da thread, basta executar a função TERMINATE.
- *
-*/
-class Trem: public QThread{
- Q_OBJECT
+class Trem : public QThread {
+    Q_OBJECT
+
 public:
-    Trem(int,int,int);  //construtor
-    void run();         //função a ser executada pela thread
+    Trem(int ID, int x, int y, QSlider *slider);
+    void run() override;
+    static Trem* trems[6];
+    void setTrens(Trem* trems[]);
 
-
-//Cria um sinal
 signals:
-    void updateGUI(int,int,int);
+    void updateGUI(int, int, int);
 
 private:
-    int x;           //posição X do trem na tela
-    int y;           //posição Y do trem na tela
-    int ID;          //ID do trem
-    int velocidade;  //Velocidade. É o tempo de dormir em milisegundos entre a mudança de posição do trem
-    QMutex mutexRegiao0;
-    QMutex mutexRegiao1;
-    QMutex mutexRegiao2;
-    QMutex mutexRegiao3;
-    QMutex mutexRegiao4;
-    QMutex mutexRegiao5;
-    QMutex mutexRegiao6;
+    int ID;
+    int x, y;
+    QSlider *slider;
+    int velocidade;
+    QSemaphore *semaphore; // Semáforo para controlar a velocidade de cada trem
+    bool isSafeToMove(int dx, int dy);
+    int  calculateRegiaoCritica();
+    void moveTrem();
 };
 
 #endif // TREM_H
